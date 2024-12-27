@@ -1437,7 +1437,7 @@ static const struct max1363_chip_info max1363_chip_info_tbl[] = {
 
 static int max1363_initial_setup(struct max1363_state *st)
 {
-	st->setupbyte = MAX1363_SETUP_INT_CLOCK
+	st->setupbyte = MAX1363_SETUP_EXT_CLOCK
 		| MAX1363_SETUP_UNIPOLAR
 		| MAX1363_SETUP_NORESET;
 

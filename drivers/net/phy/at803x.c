@@ -1292,9 +1292,10 @@ static int at803x_read_status(struct phy_device *phydev)
 {
 	struct at803x_priv *priv = phydev->priv;
 	int err, old_link = phydev->link;
+	bool changed;
 
 	if (priv->is_1000basex)
-		return genphy_c37_read_status(phydev);
+		return genphy_c37_read_status(phydev, &changed);
 
 	/* Update the link, but return if there was an error */
 	err = genphy_update_link(phydev);

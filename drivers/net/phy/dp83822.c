@@ -379,7 +379,6 @@ static int dp83822_read_status(struct phy_device *phydev)
 static int dp83822_config_init(struct phy_device *phydev)
 {
 	struct dp83822_private *dp83822 = phydev->priv;
-	struct device *dev = &phydev->mdio.dev;
 	int rgmii_delay;
 	s32 rx_int_delay;
 	s32 tx_int_delay;
@@ -387,7 +386,7 @@ static int dp83822_config_init(struct phy_device *phydev)
 	int bmcr;
 
 	if (phy_interface_is_rgmii(phydev)) {
-		rx_int_delay = phy_get_internal_delay(phydev, dev, NULL, 0,
+		rx_int_delay = phy_get_internal_delay(phydev, NULL, 0,
 						      true);
 
 		if (rx_int_delay <= 0)
@@ -395,7 +394,7 @@ static int dp83822_config_init(struct phy_device *phydev)
 		else
 			rgmii_delay = DP83822_RX_CLK_SHIFT;
 
-		tx_int_delay = phy_get_internal_delay(phydev, dev, NULL, 0,
+		tx_int_delay = phy_get_internal_delay(phydev, NULL, 0,
 						      false);
 		if (tx_int_delay <= 0)
 			rgmii_delay &= ~DP83822_TX_CLK_SHIFT;

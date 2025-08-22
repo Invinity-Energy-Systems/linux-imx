@@ -2457,7 +2457,7 @@ EXPORT_SYMBOL(genphy_read_status);
  *   by comparing what we advertise with what the link partner
  *   advertises. This function is for Clause 37 1000Base-X mode.
  */
-int genphy_c37_read_status(struct phy_device *phydev)
+int genphy_c37_read_status(struct phy_device *phydev, bool *changed)
 {
 	int lpa, err, old_link = phydev->link;
 
@@ -2467,9 +2467,13 @@ int genphy_c37_read_status(struct phy_device *phydev)
 		return err;
 
 	/* why bother the PHY if nothing can have changed */
-	if (phydev->autoneg == AUTONEG_ENABLE && old_link && phydev->link)
+	if (phydev->autoneg == AUTONEG_ENABLE && old_link && phydev->link) {
+		*changed = false;
 		return 0;
+	}
 
+	/* Signal link has changed */
+	*changed = true;
 	phydev->duplex = DUPLEX_UNKNOWN;
 	phydev->pause = 0;
 	phydev->asym_pause = 0;
@@ -2850,7 +2854,6 @@ static int phy_get_int_delay_property(struct device *dev, const char *name)
 /**
  * phy_get_internal_delay - returns the index of the internal delay
  * @phydev: phy_device struct
- * @dev: pointer to the devices device struct
  * @delay_values: array of delays the PHY supports
  * @size: the size of the delay array
  * @is_rx: boolean to indicate to get the rx internal delay
@@ -2863,15 +2866,16 @@ static int phy_get_int_delay_property(struct device *dev, const char *name)
  * array then size = 0 and the value of the delay property is returned.
  * Return -EINVAL if the delay is invalid or cannot be found.
  */
-s32 phy_get_internal_delay(struct phy_device *phydev, struct device *dev,
-			   const int *delay_values, int size, bool is_rx)
+s32 phy_get_internal_delay(struct phy_device *phydev, const int *delay_values,
+			   int size, bool is_rx)
 {
-	s32 delay;
-	int i;
+	struct device *dev = &phydev->mdio.dev;
+	int i, ret;
+	u32 delay;
 
 	if (is_rx) {
-		delay = phy_get_int_delay_property(dev, "rx-internal-delay-ps");
-		if (delay < 0 && size == 0) {
+		ret = phy_get_u32_property(dev, "rx-internal-delay-ps", &delay);
+		if (ret < 0 && size == 0) {
 			if (phydev->interface == PHY_INTERFACE_MODE_RGMII_ID ||
 			    phydev->interface == PHY_INTERFACE_MODE_RGMII_RXID)
 				return 1;
@@ -2880,8 +2884,8 @@ s32 phy_get_internal_delay(struct phy_device *phydev, struct device *dev,
 		}
 
 	} else {
-		delay = phy_get_int_delay_property(dev, "tx-internal-delay-ps");
-		if (delay < 0 && size == 0) {
+		ret = phy_get_u32_property(dev, "tx-internal-delay-ps", &delay);
+		if (ret < 0 && size == 0) {
 			if (phydev->interface == PHY_INTERFACE_MODE_RGMII_ID ||
 			    phydev->interface == PHY_INTERFACE_MODE_RGMII_TXID)
 				return 1;
@@ -2890,10 +2894,10 @@ s32 phy_get_internal_delay(struct phy_device *phydev, struct device *dev,
 		}
 	}
 
-	if (delay < 0)
-		return delay;
+	if (ret < 0)
+		return ret;
 
-	if (delay && size == 0)
+	if (size == 0)
 		return delay;
 
 	if (delay < delay_values[0] || delay > delay_values[size - 1]) {

@@ -107,6 +107,9 @@ static const struct vsc8531_edge_rate_table edge_table[] = {
 };
 #endif
 
+static const int vsc85xx_internal_delay[] = {200, 800, 1100, 1700, 2000, 2300,
+					     					2600, 3400};
+
 static int vsc85xx_phy_read_page(struct phy_device *phydev)
 {
 	return __phy_read(phydev, MSCC_EXT_PAGE_ACCESS);

@@ -204,6 +204,15 @@
 			rx-internal-delay-ps = <2000>;
 			tx-internal-delay-ps = <2000>;
 		};
+		ethphy_fec1: ethernet-phy@5 {
+			reg = <5>;
+			tx-fifo-depth = <DP83869_PHYCR_FIFO_DEPTH_4_B_NIB>;
+			rx-fifo-depth = <DP83869_PHYCR_FIFO_DEPTH_4_B_NIB>;
+			ti,op-mode = <DP83869_RGMII_1000_BASE>;
+			ti,max-output-impedance;
+			rx-internal-delay-ps = <2000>;
+			tx-internal-delay-ps = <2000>;
+		};
 	};
 };
 
@@ -211,7 +220,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_fec>;
 	phy-mode = "rgmii";
-	phy-handle = <&ethphy1>;
+	phy-handle = <&ethphy_fec1>;
 	phy-reset-gpios = <&pca9698 4 GPIO_ACTIVE_LOW>;
 	phy-reset-active-low;
 	phy-reset-duration = <10>;

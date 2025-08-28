@@ -713,8 +713,9 @@ static int dp83869_configure_mode(struct phy_device *phydev,
 			return -EINVAL;
 		}
 	}
+	
 	ret = phy_write_mmd(phydev, DP83869_DEVADDR, DP83869_OP_MODE,
-			    dp83869->mode);
+                    phy_ctrl_val);
 	if (ret)
 		return ret;
 

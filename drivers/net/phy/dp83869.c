@@ -713,7 +713,7 @@ static int dp83869_configure_mode(struct phy_device *phydev,
 			return -EINVAL;
 		}
 	}
-	
+
 	ret = phy_write_mmd(phydev, DP83869_DEVADDR, DP83869_OP_MODE,
                     phy_ctrl_val);
 	if (ret)
@@ -840,8 +840,8 @@ static int dp83869_config_init(struct phy_device *phydev)
 			return ret;
 
 		val = phy_read_mmd(phydev, DP83869_DEVADDR, DP83869_RGMIICTL);
-		val |= (DP83869_RGMII_TX_CLK_DELAY_EN |
-			DP83869_RGMII_RX_CLK_DELAY_EN);
+		val &= ~DP83869_RGMII_RX_CLK_DELAY_EN;
+		val |= DP83869_RGMII_TX_CLK_DELAY_EN;
 
 		if (phydev->interface == PHY_INTERFACE_MODE_RGMII_ID)
 			val &= ~(DP83869_RGMII_TX_CLK_DELAY_EN |
